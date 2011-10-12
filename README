@@ -1,0 +1,10 @@
+To run the test version of the clustering algorithm, do one of the following:
+
+(1)  Just run the "testKMeans" main, and then "PlotClusteringOutput.R" in R, or
+
+(2)  if you want to play around with the types of possible data speads, open up "MakeSomeData.R" and fiddle around with the data to your hearts desire. Run that file, then run (1) above.
+
+That's all for now... 
+
+
+
