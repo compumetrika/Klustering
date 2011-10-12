@@ -20,6 +20,8 @@ public class testKMeans {
     public static void main(String[] args) throws IOException {
         // This is testing the Data class.
         
+        Long newSeed = 1279492245l;
+        
         // create a data object.
         Data testData = new Data();
         try {
@@ -34,9 +36,11 @@ public class testKMeans {
         testData.printData();
         
         // create a KMeans object
-        KMeans testKluster = new KMeans(testData, 2);
+        KMeans testKluster = new KMeans(testData, 5, newSeed);
+        //KMeans testKluster = new KMeans(testData, 3);
         
         // run the simulation, spit out output:
+        testKluster.setMaxIterations(100);
         testKluster.init();
         testKluster.runClustering();
         testKluster.writeOutput("testClustering.csv");

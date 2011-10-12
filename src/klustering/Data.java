@@ -16,13 +16,14 @@ public class Data {
 
     ArrayList <Point> points = new ArrayList <Point>();
     public Point maxPoint = new Point();
-
+    public Point minPoint = new Point();
     
     public void getData(String pathname, boolean hasHeader) throws FileNotFoundException, IOException {
 
         Double xnew, ynew;
         String [] nextLine;
-        maxPoint.setZero();
+        maxPoint.setMin();
+        minPoint.setMax();
         Point newpoint = new Point();
         
         CSVReader reader = new CSVReader(new FileReader(pathname));
@@ -35,9 +36,11 @@ public class Data {
             xnew = Double.parseDouble(nextLine[0]);
             ynew = Double.parseDouble(nextLine[1]);
             
-            // Update the max point. 
+            // Update the max point and min point.
             maxPoint.x = Math.max(maxPoint.x, xnew);
             maxPoint.y = Math.max(maxPoint.y, ynew);
+            minPoint.x = Math.min(minPoint.x, xnew);
+            minPoint.y = Math.min(minPoint.y, ynew);
 
             newpoint = new Point();
             newpoint.x = xnew;
@@ -58,6 +61,8 @@ public class Data {
             }
             System.out.println("The max point in the system is (with epsilon added):");
             maxPoint.print();
+            System.out.println("The min point in the system is (with epsilon added):");
+            minPoint.print();
         } else {
             System.out.println("No points in the data list!");
         }

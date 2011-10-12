@@ -94,6 +94,9 @@ public class KMeans {
     }
 
     
+    public void setMaxIterations(Integer newmax) {
+        maxIterations = newmax;
+    }    
     
     public void init() {
 
@@ -115,8 +118,8 @@ public class KMeans {
             // choose random point as centroid inside the range of the data;
             // set this as the center of a new cluster
             newCenterPoint = new Point();
-            newCenterPoint.x = random.nextDouble()*data.maxPoint.x;
-            newCenterPoint.y = random.nextDouble()*data.maxPoint.y;
+            newCenterPoint.x = random.nextDouble()*(data.maxPoint.x - data.minPoint.x) + data.minPoint.x;
+            newCenterPoint.y = random.nextDouble()*(data.maxPoint.y - data.minPoint.y) + data.minPoint.y;            
             
             newCluster = new Cluster();
             newCluster.ID = i;
@@ -142,8 +145,9 @@ public class KMeans {
         // Now add points for the last cluster; this will simply add points 
         // until there are no more.
         newCenterPoint = new Point();
-        newCenterPoint.x = random.nextDouble()*data.maxPoint.x;
-        newCenterPoint.y = random.nextDouble()*data.maxPoint.y;
+        newCenterPoint.x = random.nextDouble()*(data.maxPoint.x - data.minPoint.x) + data.minPoint.x;
+        newCenterPoint.y = random.nextDouble()*(data.maxPoint.y - data.minPoint.y) + data.minPoint.y;
+
 
         newCluster = new Cluster();
         newCluster.ID = K-1;
@@ -160,6 +164,10 @@ public class KMeans {
         
         entropy += newCluster.getEntropy();
         entropyHistory.add(entropy);
+        
+        for (Cluster cluster : clusters) {
+            cluster.print();
+        }
 
     }
     

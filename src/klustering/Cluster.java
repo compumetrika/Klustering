@@ -71,9 +71,14 @@ public class Cluster {
     }
  
 
-//    public void print(){
-//        System.out.println("(" + x + ", " + y + ")" + " ID: " + clusterID);
-//    }
+    public void print(){
+        
+        System.out.println("\nCluster number: "+ ID);
+        System.out.println("Centeroid is: ");
+        centroid.print();
+        System.out.println("Number of elements in cluster = " + points.size());
+        System.out.println("Total distance to center = "+ entropy +"\n");
+    }
 
     
     

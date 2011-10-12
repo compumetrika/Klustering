@@ -22,6 +22,16 @@ public class Point {
         y = 0.0;        
     }
 
+    public void setMax() {
+        x = Double.MAX_VALUE;
+        y = Double.MAX_VALUE;        
+    }
+
+    public void setMin() {
+        x = Double.MIN_VALUE;
+        y = Double.MIN_VALUE;        
+    }
+
     public void addEpsilon() {
         x += 0.0001;
         y += 0.0001;        
