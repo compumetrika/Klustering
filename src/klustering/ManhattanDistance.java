@@ -7,12 +7,10 @@ package klustering;
  *
  * @author npalmer4
  */
-public class EUDistance implements Distance {
+public class ManhattanDistance implements Distance {
 
     @Override
     public Double getDistance(Point A, Point B) {
-        Double squareSum = Math.pow(A.x - B.x,2) + Math.pow(A.y - B.y,2);
-        return( Math.pow(Math.pow(A.x - B.x,2) + Math.pow(A.y - B.y,2), 0.5) );
+        return( Math.abs(A.x - B.x) + Math.abs(A.y - B.y) );
     }
-
 }

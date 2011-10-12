@@ -14,14 +14,52 @@ import java.io.FileReader;
  */
 public class Data {
 
-    ArrayList <Point> points;
+    ArrayList <Point> points = new ArrayList <Point>();
+    public Point maxPoint = new Point();
+
     
-    public void getData(String pathname) throws FileNotFoundException, IOException {
-        CSVReader reader = new CSVReader(new FileReader("yourfile.csv"));
+    public void getData(String pathname, boolean hasHeader) throws FileNotFoundException, IOException {
+
+        Double xnew, ynew;
         String [] nextLine;
+        maxPoint.setZero();
+        Point newpoint = new Point();
+        
+        CSVReader reader = new CSVReader(new FileReader(pathname));
+
+        if (hasHeader)
+            reader.readNext(); // need to dispose of header if it exists.
+        
         while ((nextLine = reader.readNext()) != null) {
-            // nextLine[] is an array of values from the line
-            System.out.println(nextLine[0] + nextLine[1] + "etc...");
+
+            xnew = Double.parseDouble(nextLine[0]);
+            ynew = Double.parseDouble(nextLine[1]);
+            
+            // Update the max point. 
+            maxPoint.x = Math.max(maxPoint.x, xnew);
+            maxPoint.y = Math.max(maxPoint.y, ynew);
+
+            newpoint = new Point();
+            newpoint.x = xnew;
+            newpoint.y = ynew;
+            points.add(newpoint);
+
+            System.out.println(nextLine[0] + ", "+ nextLine[1]);
+        }
+
+        maxPoint.addEpsilon();
+    }
+    
+    
+    public void printData(){
+        if (points.size() > 0) {
+            for (int i = 0; i < points.size(); i++) {
+                points.get(i).print();
+            }
+            System.out.println("The max point in the system is (with epsilon added):");
+            maxPoint.print();
+        } else {
+            System.out.println("No points in the data list!");
         }
     }
     
