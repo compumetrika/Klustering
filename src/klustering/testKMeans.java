@@ -36,8 +36,8 @@ public class testKMeans {
         testData.printData();
         
         // create a KMeans object
-        KMeans testKluster = new KMeans(testData, 5, newSeed);
-        //KMeans testKluster = new KMeans(testData, 3);
+        //KMeans testKluster = new KMeans(testData, 3, newSeed);
+        KMeans testKluster = new KMeans(testData, 3);
         
         // run the simulation, spit out output:
         testKluster.setMaxIterations(100);

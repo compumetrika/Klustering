@@ -16,11 +16,20 @@ import java.util.LinkedList;
  */
 public class Cluster {
     Integer ID;
-    Point centroid;
+    Point centroid = new Point();
     Double entropy = 0.0;
     LinkedList <Point> points = new LinkedList <Point>();
-    
-    
+   
+
+    Cluster() {
+        centroid.setZero();
+        entropy = Double.MAX_VALUE;
+    }
+        
+    Cluster(Point newCentroid) {
+        centroid = newCentroid;
+    }
+       
     public void calculateCentroid(){
         Double xvalue, yvalue;
         int n = points.size();
@@ -38,6 +47,10 @@ public class Cluster {
         centroid = newCentroid;
     }
 
+    public void setMaxEntropy() {
+        entropy = Double.MAX_VALUE;
+    }
+    
     public Point getCenteroid(){
         return(centroid);
     }
@@ -48,14 +61,38 @@ public class Cluster {
         points.add(newpoint);
     }
 
-    public void removePoint(Point oldpoint) {
-        points.remove(oldpoint);
-    }    
-    
-    public void Cluster (){
-        
+    public void addPointAndUpdate(Point newpoint) {
+        //newpoint.print();
+        points.add(newpoint);
+        this.update();
     }
     
+    
+    public void removePoint(Point oldpoint) {
+        points.remove(oldpoint);
+    }
+    
+    public void removePointAndUpdate(Point oldpoint) {
+        points.remove(oldpoint);
+        this.update();
+    }    
+    
+    public void removeAll() {            
+        points.clear();
+    }        
+
+    public void removeAllAndUpdate() {
+        points.clear();
+        this.update();
+        centroid.setZero();
+    }        
+    
+    
+    public void update(){
+        this.calculateCentroid();
+        this.getEntropy();
+    }
+
     public double getEntropy() {
         // This is just summing up all the distances in the cluster. 
         // Distances from the current center, that is. 
@@ -80,6 +117,17 @@ public class Cluster {
         System.out.println("Total distance to center = "+ entropy +"\n");
     }
 
+    public void printAll(){
+        
+        System.out.println("\nCluster number: "+ ID);
+        System.out.println("Centeroid is: ");
+        centroid.print();
+        System.out.println("Number of elements in cluster = " + points.size());
+        System.out.println("Total distance to center = "+ entropy +"\n");
+        for (Point point : points) {
+            point.print();
+        }
+    }
     
     
 }

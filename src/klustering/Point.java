@@ -11,12 +11,16 @@ package klustering;
 public class Point {
     public Double x;
     public Double y;
-    public Integer clusterID = 5000;
-//    public void Point(Double newx, Double newy) {
-//        x = newx;
-//        y = newy;
-//    }
+    public Integer clusterID = Integer.MAX_VALUE;
+
+    Point(Double newx, Double newy) {
+        x = newx;
+        y = newy;
+    }
     
+    Point() {
+    }
+        
     public void setZero() {
         x = 0.0;
         y = 0.0;        

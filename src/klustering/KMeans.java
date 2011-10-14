@@ -8,7 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.Random;
 
 
@@ -30,13 +29,7 @@ public class KMeans {
     Data data = new Data();
     ArrayList <Integer> shuffledIndeces = new ArrayList <Integer>();
     Random random = new Random();
-    
-//    public void KMeans(LinkedList <Points> data, Integer K) {
-//    public void init(LinkedList <Point> data, Integer K) {
-        // create K clusters
-        // for points in data:
-        //   - add point to random cluster
-//    }
+
     
     KMeans(Data newData, Integer newK) {
         data = newData;
@@ -46,7 +39,7 @@ public class KMeans {
         for (Integer i=0; i<data.points.size(); i++) {
            shuffledIndeces.add(i);
         }
-        Collections.shuffle(shuffledIndeces);
+        //Collections.shuffle(shuffledIndeces);
         
         maxIterations = 5000;
 
@@ -60,7 +53,7 @@ public class KMeans {
         for (Integer i=0; i<data.points.size(); i++) {
            shuffledIndeces.add(i);
         }
-        Collections.shuffle(shuffledIndeces);
+        //Collections.shuffle(shuffledIndeces);
         
         maxIterations = newMaxIter;
 
@@ -77,7 +70,7 @@ public class KMeans {
         for (Integer i=0; i<data.points.size(); i++) {
            shuffledIndeces.add(i);
         }
-        Collections.shuffle(shuffledIndeces);
+        //Collections.shuffle(shuffledIndeces);
     }
 
     KMeans(Data newData, Integer newK, Integer newMaxIter, Long seed) {
@@ -90,7 +83,7 @@ public class KMeans {
         for (Integer i=0; i<data.points.size(); i++) {
            shuffledIndeces.add(i);
         }
-        Collections.shuffle(shuffledIndeces);
+        //Collections.shuffle(shuffledIndeces);
     }
 
     
@@ -112,59 +105,36 @@ public class KMeans {
         // we want to loop for K-1 clusters, and then in the last cluster, 
         // simply add until there are no more points.
 
-        Integer dataIndex = 0;               
+        Integer dataIndex = 0;    
         
-        for (int i = 0; i < (K-1); i++) {
-            // choose random point as centroid inside the range of the data;
-            // set this as the center of a new cluster
+        // ----------- trying new thing ------------
+        // Choose random centers first:
+        for (int i = 0; i < K; i++) {
             newCenterPoint = new Point();
             newCenterPoint.x = random.nextDouble()*(data.maxPoint.x - data.minPoint.x) + data.minPoint.x;
-            newCenterPoint.y = random.nextDouble()*(data.maxPoint.y - data.minPoint.y) + data.minPoint.y;            
-            
+            newCenterPoint.y = random.nextDouble()*(data.maxPoint.y - data.minPoint.y) + data.minPoint.y;
+
             newCluster = new Cluster();
             newCluster.ID = i;
+            newCenterPoint.clusterID = i;
             newCluster.setCenteroid(newCenterPoint);
-            
-            // now choose K points and assign the closest 
-            // well, no, nothing fancy at first...
-            for (int j = 0; j < clusterSize; j++) {
-                int newIndex  = shuffledIndeces.get(dataIndex);   // pull an index off the "shuffled" list
-                newPoint = data.points.get(newIndex);
-                newPoint.clusterID = i;
-                newPoint.print();
-                newCluster.addPoint(newPoint);
-                dataIndex += 1;
-            }
-            
-            clusters.add(newCluster); 
-            
-            // Determine entropy of this new cluster and record total entropy.
+            newCluster.setMaxEntropy();
+            clusters.add(newCluster);
             entropy += newCluster.getEntropy();
+
         }
-        
-        // Now add points for the last cluster; this will simply add points 
-        // until there are no more.
-        newCenterPoint = new Point();
-        newCenterPoint.x = random.nextDouble()*(data.maxPoint.x - data.minPoint.x) + data.minPoint.x;
-        newCenterPoint.y = random.nextDouble()*(data.maxPoint.y - data.minPoint.y) + data.minPoint.y;
-
-
-        newCluster = new Cluster();
-        newCluster.ID = K-1;
-        newCluster.setCenteroid(newCenterPoint);
-
-        while (dataIndex < data.points.size()) {
-            int newIndex  = shuffledIndeces.get(dataIndex);   // pull an index off the "shuffled" list
-            newPoint = data.points.get(newIndex);
-            newPoint.clusterID = K-1;
-            newCluster.addPoint(newPoint);
-            dataIndex += 1;
-        }
-        clusters.add(newCluster);
-        
-        entropy += newCluster.getEntropy();
         entropyHistory.add(entropy);
+ 
+        // assign all points to the first cluster for the first pass:
+        for(Point point : data.points) {
+            point.clusterID = 0;
+            clusters.get(0).addPoint(point);
+        }
         
+        // Now loop over all points and add them to the closest cluster.
+        this.reassignPoints();
+        this.updateClusters();
+
         for (Cluster cluster : clusters) {
             cluster.print();
         }
@@ -205,9 +175,9 @@ public class KMeans {
         // cluster. Assign each point to the closest centeroid. Calculate entropy of system.
         
         // First shuffle indeces
-        Collections.shuffle(shuffledIndeces);
+        //Collections.shuffle(shuffledIndeces);
         
-        int clusterID;
+        int newClusterID;
         Point thisPoint;
         Double distance, compareDistance;
         EUDistance distanceFinder = new EUDistance();
@@ -216,30 +186,52 @@ public class KMeans {
             
             // select a random point
             thisPoint = data.points.get(shuffledIndeces.get(i));
-            
-            // this will ID the cluster to add the point to
-            clusterID = 0;
-            distance = distanceFinder.getDistance(thisPoint, clusters.get(0).centroid);
-            
-            // For each cluster K, check distance from point to centeriod
-            for(int j=1; j<K; j++) {
-                compareDistance = distanceFinder.getDistance(thisPoint, clusters.get(j).centroid);
 
-                if (distance < compareDistance) {
-                    clusterID = j;
-                    distance = compareDistance;
-                }
-            }
+            newClusterID = this.getClosestCluster(thisPoint);
             
             // Now remove the point from one cluster and add it to the "correct" cluster
             clusters.get(thisPoint.clusterID).removePoint(thisPoint);
-            thisPoint.clusterID = clusterID;
-            clusters.get(clusterID).addPoint(thisPoint);            
+            thisPoint.clusterID = newClusterID;
+            clusters.get(newClusterID).addPoint(thisPoint);            
+            
             
         }
         
     }
 
+    
+    public Integer getClosestCluster(Point point) {
+        Double minDistance = Double.MAX_VALUE;
+        Double newDistance;
+        
+        Integer newClusterID = 0;
+        EUDistance distanceFinder = new EUDistance();
+
+        minDistance = distanceFinder.getDistance(point, clusters.get(newClusterID).centroid);
+
+        for(int i = 1; i < clusters.size(); i++) {
+            newDistance = distanceFinder.getDistance(point, clusters.get(i).centroid);
+
+            if (newDistance < minDistance) {
+                newClusterID = i;
+                minDistance = newDistance;
+            }
+        }
+        
+        return newClusterID;
+    }
+    
+    public void clearClusters() {
+        for(Cluster cluster : clusters) {
+            cluster.points.clear();
+        }
+    }    
+    
+    public void updateClusters() {
+        for(Cluster cluster : clusters) {
+            cluster.update();
+        }
+    }
     
     public void findCentroids() {
         for(int i=0; i<K; i++) {
@@ -278,8 +270,10 @@ public class KMeans {
         boolean doneIterating = false;
         while ((iterationCounter < maxIterations) & !doneIterating) {
 
+            this.clearClusters();
             this.reassignPoints();
-            this.findCentroids();
+            this.updateClusters();
+//            this.findCentroids();
             this.updateEntropy();
             
             
